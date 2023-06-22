@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import validator, { cnpj } from "cpf-cnpj-validator";
+import validator from "cpf-cnpj-validator";
 
 const express = require("express");
 const mysql = require("mysql");
@@ -37,7 +37,7 @@ const database = mysql.createConnection({
 
 database.connect();
 
-const port = 4568;
+const port = process.env.PORT || 4568;
 
 app.get("/init", (req: Request, res: Response) => {
     const sqlQuery =

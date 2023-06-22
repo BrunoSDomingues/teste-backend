@@ -1,31 +1,20 @@
+// Imports
 import { Request, Response } from "express";
-import validator from "cpf-cnpj-validator";
 import express from "express";
 import mysql from "mysql";
 import bodyParser from "body-parser";
+import { cpf, cnpj } from "cpf-cnpj-validator"; // Package that validates the CPF/CNPJ, found at https://www.npmjs.com/package/cpf-cnpj-validator
+import { pjSchema } from "schemas"; // Body schema
+import { formatCEP, formatPhone } from "formatters"; // Formatters for CEP and phones for storing in database
 
-const Joi = require("joi").extend(validator);
-
+// Define app and use JSON body parser
 const app = express();
 app.use(bodyParser.json());
 
+// Setting dotenv
 require("dotenv").config();
 
-const pjSchema = Joi.object().options({ abortEarly: false }).keys({
-    cnpj: Joi.document().cnpj().required(),
-    cpf: Joi.document().cpf().required(),
-    nome: Joi.string().required(),
-    celular: Joi.string().required(),
-    telefone: Joi.string().required(),
-    email: Joi.string().email().required(),
-    cep: Joi.string().required(),
-    endereco: Joi.string().required(),
-    numero: Joi.number().required(),
-    complemento: Joi.string().required(),
-    cidade: Joi.string().required(),
-    bairro: Joi.string().required(),
-    estado: Joi.string().required(),
-});
+// Database connection
 
 const database = mysql.createConnection({
     user: "root",
@@ -36,6 +25,8 @@ const database = mysql.createConnection({
 });
 
 database.connect();
+
+// App port and routes
 
 const port = process.env.PORT || 4568;
 
@@ -52,7 +43,7 @@ app.get("/init", (req: Request, res: Response) => {
         "cep VARCHAR(9) NOT NULL" +
         "endereco VARCHAR(255) NOT NULL" +
         "numero INT(10) NOT NULL" +
-        "complemento VARCHAR(100) NOT NULL" +
+        "complemento VARCHAR(100)" +
         "cidade VARCHAR(100) NOT NULL" +
         "bairro VARCHAR(100) NOT NULL" +
         "estado VARCHAR(100) NOT NULL" +
@@ -65,10 +56,44 @@ app.get("/init", (req: Request, res: Response) => {
     });
 });
 
+app.get("/pj", (req: Request, res: Response) => {
+    const sqlQuery = "SELECT * FROM pessoas_juridicas";
+
+    database.query(sqlQuery, (err, result) => {
+        if (err) throw err;
+
+        res.send({ pessoas_juridicas: result });
+    });
+});
+
 app.post("/register/pj", (req: Request, res: Response) => {
     if (pjSchema.validate(req.body).error)
         res.send(pjSchema.validate(req.body).error.details);
-    else res.send("OK!");
+    else {
+        const pessoaJuridica = {
+            cnpj: cnpj.format(req.body.cnpj),
+            cpf: cpf.format(req.body.cpf),
+            nome: req.body.nome,
+            celular: formatPhone(req.body.celular),
+            telefone: formatPhone(req.body.telefone),
+            email: req.body.email,
+            cep: formatCEP(req.body.cep),
+            endereco: req.body.endereco,
+            numero: req.body.numero,
+            complemento: req.body.complemento,
+            cidade: req.body.cidade,
+            bairro: req.body.bairro,
+            estado: req.body.estado,
+        };
+
+        const sqlQuery = "INSERT INTO pessoas_juridicas SET ?";
+
+        database.query(sqlQuery, pessoaJuridica, (err, row) => {
+            if (err) throw err;
+
+            res.send("Cadastro realizado!");
+        });
+    }
 });
 
 app.listen(port, () => {

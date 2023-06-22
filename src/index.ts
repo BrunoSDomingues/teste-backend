@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import validator from "cpf-cnpj-validator";
+import express from "express";
+import mysql from "mysql";
+import bodyParser from "body-parser";
 
-const express = require("express");
-const mysql = require("mysql");
-const bodyParser = require("body-parser");
 const Joi = require("joi").extend(validator);
 
 const app = express();

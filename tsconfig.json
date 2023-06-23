@@ -4,6 +4,7 @@
     "baseUrl": "src",
     "module": "commonjs",
     "outDir": "./dist",
+    "resolveJsonModule": true,
     "strict": true,
     "strictPropertyInitialization": false,
     "allowJs": true,

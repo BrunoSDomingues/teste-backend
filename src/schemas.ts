@@ -1,51 +1,39 @@
-import validator from "cpf-cnpj-validator"; // Package that validates the CPF/CNPJ, found at https://www.npmjs.com/package/cpf-cnpj-validator
+import validator from "cpf-cnpj-validator";
 
-// Using Joi to validate fields using schemas, and extending to use the validator for CPF/CNPJ
+// Extend Joi with CPF/CNPJ validator
 const Joi = require("joi").extend(validator);
+
+// Common validation messages
+const validationMessages = {
+    cep: "CEP inválido! Formatos aceitos: 66115-092 ou 66115092",
+    celular:
+        "Celular inválido! Formatos aceitos: (61) 98831-7667 ou 61988317667",
+    telefone:
+        "Telefone inválido! Formatos aceitos: (81) 3771-2636 ou 8137712636",
+};
 
 // Validates CEP
 const cepSchema = Joi.string()
-    .custom((value: string, helper: any) => {
-        var regex1 = /^[0-9]{5}-[0-9]{3}$/; // Format xxxxx-xxx
-        var regex2 = /^[0-9]{8}$/; // Format xxxxxxxx
-        if (!regex1.test(value) && !regex2.test(value))
-            return helper.message(
-                "CEP inválido! Formatos aceitos: 66115-092 ou 66115092"
-            );
-        return true;
-    })
-    .required();
+    .pattern(/^(?:\d{5}-\d{3}|\d{8})$/) // Format: xxxxx-xxx or xxxxxxxx
+    .required()
+    .messages({ "string.pattern.base": validationMessages.cep });
 
 // Validates phone numbers
 const cellSchema = Joi.string()
-    .custom((value: string, helper: any) => {
-        var regex1 = /^\([0-9]{2}\) [0-9]{5}-[0-9]{4}$/; // Format (xx) xxxxx-xxxx
-        var regex2 = /^[0-9]{11}$/; // Format xxxxxxxxxxx
-        if (!regex1.test(value) && !regex2.test(value))
-            return helper.message(
-                "Celular inválido! Formatos aceitos: (61) 98831-7667 ou 61988317667"
-            );
-        return true;
-    })
-    .required();
+    .pattern(/^(?:\(\d{2}\) \d{5}-\d{4}|\d{11})$/) // Format: (xx) xxxxx-xxxx or xxxxxxxxxxx
+    .required()
+    .messages({ "string.pattern.base": validationMessages.celular });
 
 const phoneSchema = Joi.string()
-    .custom((value: string, helper: any) => {
-        var regex1 = /^\([0-9]{2}\) [0-9]{4}-[0-9]{4}$/; // Format (xx) xxxx-xxxx
-        var regex2 = /^[0-9]{10}$/; // Format xxxxxxxxxx
-        if (!regex1.test(value) && !regex2.test(value))
-            return helper.message(
-                "Telefone inválido! Formatos aceitos: (81) 3771-2636 ou 8137712636"
-            );
-        return true;
-    })
-    .required();
+    .pattern(/^(?:\(\d{2}\) \d{4}-\d{4}|\d{10})$/) // Format: (xx) xxxx-xxxx or xxxxxxxxxx
+    .required()
+    .messages({ "string.pattern.base": validationMessages.telefone });
 
-// Default string schema
+// Common string schema
 const stringSchema = Joi.string().required();
 
 // Body schema
-export const pjSchema = Joi.object().options({ abortEarly: false }).keys({
+export const pjSchema = Joi.object({
     cnpj: Joi.document().cnpj().required(),
     cpf: Joi.document().cpf().required(),
     nome: stringSchema,
@@ -55,8 +43,8 @@ export const pjSchema = Joi.object().options({ abortEarly: false }).keys({
     cep: cepSchema,
     endereco: stringSchema,
     numero: Joi.number().required(),
-    complemento: Joi.string().optional(),
+    complemento: Joi.string().allow(null).optional(),
     cidade: stringSchema,
     bairro: stringSchema,
     estado: stringSchema,
-});
+}).options({ abortEarly: false });

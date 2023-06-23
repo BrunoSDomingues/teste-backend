@@ -11,6 +11,11 @@ import { formatCEP, formatPhone } from "formatters"; // Formatters for CEP and p
 const app = express();
 app.use(bodyParser.json());
 
+// Swagger UI
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("../swagger.json");
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 // Setting dotenv
 require("dotenv").config();
 
@@ -33,30 +38,29 @@ const port = process.env.PORT || 4568;
 app.get("/init", (req: Request, res: Response) => {
     const sqlQuery =
         "CREATE TABLE IF NOT EXISTS pessoas_juridicas(" +
-        "id int AUTO_INCREMENT" +
-        "cnpj VARCHAR(14) NOT NULL" +
-        "cpf VARCHAR(11) NOT NULL" +
-        "nome VARCHAR(255) NOT NULL" +
-        "celular VARCHAR(20) NOT NULL" +
-        "telefone VARCHAR(20) NOT NULL" +
-        "email VARCHAR(100) NOT NULL" +
-        "cep VARCHAR(9) NOT NULL" +
-        "endereco VARCHAR(255) NOT NULL" +
-        "numero INT(10) NOT NULL" +
-        "complemento VARCHAR(100)" +
-        "cidade VARCHAR(100) NOT NULL" +
-        "bairro VARCHAR(100) NOT NULL" +
-        "estado VARCHAR(100) NOT NULL" +
-        "PRIMARY KEY(id))";
+        "id INT AUTO_INCREMENT PRIMARY KEY," +
+        "cnpj VARCHAR(14) NOT NULL," +
+        "cpf VARCHAR(11) NOT NULL," +
+        "nome VARCHAR(255) NOT NULL," +
+        "celular VARCHAR(20) NOT NULL," +
+        "telefone VARCHAR(20) NOT NULL," +
+        "email VARCHAR(100) NOT NULL," +
+        "cep VARCHAR(9) NOT NULL," +
+        "endereco VARCHAR(255) NOT NULL," +
+        "numero INT(10) NOT NULL," +
+        "complemento VARCHAR(100)," +
+        "cidade VARCHAR(100) NOT NULL," +
+        "bairro VARCHAR(100) NOT NULL," +
+        "estado VARCHAR(100) NOT NULL)";
 
     database.query(sqlQuery, (err: number) => {
         if (err) throw err;
 
-        res.send("Table created!");
+        res.send("Tabela inicializada!");
     });
 });
 
-app.get("/pj", (req: Request, res: Response) => {
+app.get("/list", (req: Request, res: Response) => {
     const sqlQuery = "SELECT * FROM pessoas_juridicas";
 
     database.query(sqlQuery, (err, result) => {
@@ -68,7 +72,7 @@ app.get("/pj", (req: Request, res: Response) => {
 
 app.post("/register/pj", (req: Request, res: Response) => {
     if (pjSchema.validate(req.body).error)
-        res.send(pjSchema.validate(req.body).error.details);
+        res.status(400).json(pjSchema.validate(req.body).error.details);
     else {
         const pessoaJuridica = {
             cnpj: cnpj.format(req.body.cnpj),

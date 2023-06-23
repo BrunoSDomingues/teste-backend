@@ -1,46 +1,19 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "description": "Essa é uma API feita para cadastro de pessoas jurídicas",
-        "version": "1.0.0",
-        "title": "Cadastro PJ API",
-        "contact": {
-            "email": "bruno_signorelli@outlook.com"
-        },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        }
+        "title": "Cadastro de Pessoa Jurídica",
+        "version": "1.0.1",
+        "description": "API para cadastro de pessoas jurídicas"
     },
     "servers": [
         {
-            "url": "http://localhost:4568/"
+            "url": "http://localhost:4568"
         }
     ],
     "paths": {
-        "/init": {
-            "get": {
-                "summary": "Criação da tabela",
-                "description": "Cria a tabela a ser usada no banco de dados MySQL",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "text/html": {
-                                "schema": {
-                                    "type": "string"
-                                },
-                                "example": "Tabela inicializada!"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/list": {
             "get": {
-                "summary": "Listagem de cadastros",
-                "description": "Lista todas as pessoas jurídicas cadastradas",
+                "summary": "Lista as pessoas jurídicas cadastradas",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -49,55 +22,54 @@
                                 "schema": {
                                     "$ref": "#/components/schemas/PessoasJuridicasResponse"
                                 },
-                                "example": [
-                                    {
-                                        "pessoas_juridicas": [
-                                            {
-                                                "id": 1,
-                                                "cnpj": "36.675.662/000",
-                                                "cpf": "633.280.523",
-                                                "nome": "Bruno Signorelli Domingues",
-                                                "celular": "(21) 99675-5880",
-                                                "telefone": "(27) 3701-3296",
-                                                "email": "brunao.signorelli@hotmail.com",
-                                                "cep": "14412-410",
-                                                "endereco": "Rua Pedro Cardoso Vidal",
-                                                "numero": 354,
-                                                "complemento": null,
-                                                "cidade": "Franca",
-                                                "bairro": "Residencial São Jerônimo",
-                                                "estado": "São Paulo"
-                                            },
-                                            {
-                                                "id": 2,
-                                                "cnpj": "36.675.662/000",
-                                                "cpf": "633.280.523",
-                                                "nome": "José da Silva Rocha",
-                                                "celular": "(21) 99675-5880",
-                                                "telefone": "(27) 3701-3296",
-                                                "email": "jose.srocha@hotmail.com",
-                                                "cep": "14412-555",
-                                                "endereco": "Rua Pedro Cardoso Vidal",
-                                                "numero": 443,
-                                                "complemento": null,
-                                                "cidade": "Franca",
-                                                "bairro": "Residencial São Jerônimo",
-                                                "estado": "São Paulo"
-                                            }
-                                        ]
-                                    }
-                                ]
+                                "example": {
+                                    "pessoas_juridicas": [
+                                        {
+                                            "id": 1,
+                                            "cnpj": "36.675.662/0001-09",
+                                            "cpf": "633.280.523-48",
+                                            "nome": "Bruno Signorelli Domingues",
+                                            "celular": "(21) 99675-5880",
+                                            "telefone": "(27) 3701-3296",
+                                            "email": "brunao.signorelli@hotmail.com",
+                                            "cep": "14412-410",
+                                            "endereco": "Rua Pedro Cardoso Vidal",
+                                            "numero": 354,
+                                            "complemento": null,
+                                            "cidade": "Franca",
+                                            "bairro": "Residencial São Jerônimo",
+                                            "estado": "São Paulo"
+                                        },
+                                        {
+                                            "id": 2,
+                                            "cnpj": "42.723.354/0001-04",
+                                            "cpf": "307.760.174-54",
+                                            "nome": "José da Silva Rocha",
+                                            "celular": "(83) 97156-4214",
+                                            "telefone": "(83) 3354-9377",
+                                            "email": "jose.srocha@hotmail.com",
+                                            "cep": "58040-810",
+                                            "endereco": "Rua Francisco Martins de Oiveira",
+                                            "numero": 227,
+                                            "complemento": null,
+                                            "cidade": "João Pessoa",
+                                            "bairro": "Torre",
+                                            "estado": "Paraíba"
+                                        }
+                                    ]
+                                }
                             }
                         }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 }
             }
         },
         "/register/pj": {
             "post": {
-                "summary": "Cadastro de uma nova Pessoa Jurídica",
-                "consumes": ["application/json"],
-                "produces": ["text/html"],
+                "summary": "Cadastra uma nova pessoa juridica",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -110,29 +82,30 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Cadastro realizado!"
                     },
                     "400": {
-                        "description": "Bad request",
+                        "description": "Bad Request",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/BadRequestError"
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
                                 },
-                                "example": [
-                                    {
-                                        "message": "CEP inválido! Formatos aceitos: 66115-092 ou 66115092",
-                                        "path": ["cep"],
-                                        "type": "custom",
-                                        "context": {
-                                            "label": "cep",
-                                            "value": "14412-55544",
-                                            "key": "cep"
-                                        }
+                                "example": {
+                                    "message": "CEP inválido! Formatos aceitos: 66115-092 ou 66115092",
+                                    "path": ["cep"],
+                                    "type": "custom",
+                                    "context": {
+                                        "label": "cep",
+                                        "value": "14412-55544",
+                                        "key": "cep"
                                     }
-                                ]
+                                }
                             }
                         }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -251,7 +224,7 @@
                     }
                 }
             },
-            "BadRequestError": {
+            "ValidationErrorResponse": {
                 "type": "array",
                 "items": {
                     "type": "object",

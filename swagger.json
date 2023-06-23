@@ -1,0 +1,290 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "description": "Essa é uma API feita para cadastro de pessoas jurídicas",
+        "version": "1.0.0",
+        "title": "Cadastro PJ API",
+        "contact": {
+            "email": "bruno_signorelli@outlook.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://localhost:4568/"
+        }
+    ],
+    "paths": {
+        "/init": {
+            "get": {
+                "summary": "Criação da tabela",
+                "description": "Cria a tabela a ser usada no banco de dados MySQL",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/html": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "Tabela inicializada!"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/list": {
+            "get": {
+                "summary": "Listagem de cadastros",
+                "description": "Lista todas as pessoas jurídicas cadastradas",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PessoasJuridicasResponse"
+                                },
+                                "example": [
+                                    {
+                                        "pessoas_juridicas": [
+                                            {
+                                                "id": 1,
+                                                "cnpj": "36.675.662/000",
+                                                "cpf": "633.280.523",
+                                                "nome": "Bruno Signorelli Domingues",
+                                                "celular": "(21) 99675-5880",
+                                                "telefone": "(27) 3701-3296",
+                                                "email": "brunao.signorelli@hotmail.com",
+                                                "cep": "14412-410",
+                                                "endereco": "Rua Pedro Cardoso Vidal",
+                                                "numero": 354,
+                                                "complemento": null,
+                                                "cidade": "Franca",
+                                                "bairro": "Residencial São Jerônimo",
+                                                "estado": "São Paulo"
+                                            },
+                                            {
+                                                "id": 2,
+                                                "cnpj": "36.675.662/000",
+                                                "cpf": "633.280.523",
+                                                "nome": "José da Silva Rocha",
+                                                "celular": "(21) 99675-5880",
+                                                "telefone": "(27) 3701-3296",
+                                                "email": "jose.srocha@hotmail.com",
+                                                "cep": "14412-555",
+                                                "endereco": "Rua Pedro Cardoso Vidal",
+                                                "numero": 443,
+                                                "complemento": null,
+                                                "cidade": "Franca",
+                                                "bairro": "Residencial São Jerônimo",
+                                                "estado": "São Paulo"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/register/pj": {
+            "post": {
+                "summary": "Cadastro de uma nova Pessoa Jurídica",
+                "consumes": ["application/json"],
+                "produces": ["text/html"],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PessoaJuridicaRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BadRequestError"
+                                },
+                                "example": [
+                                    {
+                                        "message": "CEP inválido! Formatos aceitos: 66115-092 ou 66115092",
+                                        "path": ["cep"],
+                                        "type": "custom",
+                                        "context": {
+                                            "label": "cep",
+                                            "value": "14412-55544",
+                                            "key": "cep"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "PessoasJuridicasResponse": {
+                "type": "object",
+                "properties": {
+                    "pessoas_juridicas": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PessoaJuridica"
+                        }
+                    }
+                }
+            },
+            "PessoaJuridica": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "cnpj": {
+                        "type": "string"
+                    },
+                    "cpf": {
+                        "type": "string"
+                    },
+                    "nome": {
+                        "type": "string"
+                    },
+                    "celular": {
+                        "type": "string"
+                    },
+                    "telefone": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "cep": {
+                        "type": "string"
+                    },
+                    "endereco": {
+                        "type": "string"
+                    },
+                    "numero": {
+                        "type": "integer"
+                    },
+                    "complemento": {
+                        "type": "string"
+                    },
+                    "cidade": {
+                        "type": "string"
+                    },
+                    "bairro": {
+                        "type": "string"
+                    },
+                    "estado": {
+                        "type": "string"
+                    }
+                }
+            },
+            "PessoaJuridicaRequest": {
+                "type": "object",
+                "properties": {
+                    "cnpj": {
+                        "type": "string",
+                        "example": "36.675.662/0001-09"
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "example": "633.280.523-48"
+                    },
+                    "nome": {
+                        "type": "string",
+                        "example": "José da Silva Rocha"
+                    },
+                    "celular": {
+                        "type": "string",
+                        "example": "(21) 99675-5880"
+                    },
+                    "telefone": {
+                        "type": "string",
+                        "example": "(27) 3701-3296"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "jose.srocha@hotmail.com"
+                    },
+                    "cep": {
+                        "type": "string",
+                        "example": "14412-555"
+                    },
+                    "endereco": {
+                        "type": "string",
+                        "example": "Rua Pedro Cardoso Vidal"
+                    },
+                    "numero": {
+                        "type": "integer",
+                        "example": 443
+                    },
+                    "cidade": {
+                        "type": "string",
+                        "example": "Franca"
+                    },
+                    "bairro": {
+                        "type": "string",
+                        "example": "Residencial São Jerônimo"
+                    },
+                    "estado": {
+                        "type": "string",
+                        "example": "São Paulo"
+                    }
+                }
+            },
+            "BadRequestError": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "message": {
+                            "type": "string"
+                        },
+                        "path": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "context": {
+                            "type": "object",
+                            "properties": {
+                                "label": {
+                                    "type": "string"
+                                },
+                                "value": {
+                                    "type": "string"
+                                },
+                                "key": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

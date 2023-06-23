@@ -14,6 +14,6 @@ Em seguida, é necessário instalar os pacotes utilizado pelo Node através do c
 
 ## Documentação
 
-Com o servidor rodando, é possível acessar a página abaixo para encontrar na documentação da API via Swagger:
+Com o servidor rodando, é possível acessar a página abaixo para acessar a documentação da API via Swagger:
 
 `http://localhost:4568/api-docs/`
